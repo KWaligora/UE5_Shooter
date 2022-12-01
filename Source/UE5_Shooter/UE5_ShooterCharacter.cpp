@@ -71,20 +71,6 @@ void AUE5_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAxis("Turn Right / Left Gamepad", this, &AUE5_ShooterCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("Look Up / Down Gamepad", this, &AUE5_ShooterCharacter::LookUpAtRate);
-
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AUE5_ShooterCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AUE5_ShooterCharacter::TouchStopped);
-}
-
-void AUE5_ShooterCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	Jump();
-}
-
-void AUE5_ShooterCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	StopJumping();
 }
 
 void AUE5_ShooterCharacter::TurnAtRate(float Rate)
