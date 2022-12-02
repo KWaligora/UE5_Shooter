@@ -4,6 +4,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/ShooterComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -46,6 +47,8 @@ AUE5_ShooterCharacter::AUE5_ShooterCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	
+	ShooterComponent = CreateDefaultSubobject<UShooterComponent>(TEXT("ShooterComponent"));
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -61,6 +64,8 @@ void AUE5_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUE5_ShooterCharacter::Shoot);
+
 	PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AUE5_ShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("Move Right / Left", this, &AUE5_ShooterCharacter::MoveRight);
 
@@ -71,6 +76,14 @@ void AUE5_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAxis("Turn Right / Left Gamepad", this, &AUE5_ShooterCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("Look Up / Down Gamepad", this, &AUE5_ShooterCharacter::LookUpAtRate);
+}
+
+void AUE5_ShooterCharacter::Shoot()
+{
+	if(IsValid(ShooterComponent))
+	{
+		ShooterComponent->Shoot();
+	}
 }
 
 void AUE5_ShooterCharacter::TurnAtRate(float Rate)

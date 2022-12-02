@@ -41,5 +41,5 @@ void ASecurityVideoCameraAIController::OnPerceptionUpdate(AActor* Actor, FAIStim
 	if (IsValid(ShooterCharacter) && IsValid(BlackboardComponent))
 	{
 		BlackboardComponent->SetValueAsObject("Player", ShooterCharacter);			
-	}	
+	}
 }

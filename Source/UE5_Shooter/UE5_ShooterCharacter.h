@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "UE5_ShooterCharacter.generated.h"
 
+class UShooterComponent;
 UENUM()
 enum EPerceptionState
 {
@@ -33,6 +34,17 @@ public:
 
 protected:
 	EPerceptionState PerceptionState = TPS;
+
+	UPROPERTY(EditDefaultsOnly)
+	UShooterComponent* ShooterComponent;
+
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	class USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	class UCameraComponent* FollowCamera;
 	
 	void MoveForward(float Value);
 	
@@ -44,13 +56,6 @@ protected:
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-private:
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
-
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+	void Shoot();
 };
 

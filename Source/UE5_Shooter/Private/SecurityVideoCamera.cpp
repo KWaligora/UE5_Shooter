@@ -1,4 +1,5 @@
 #include "SecurityVideoCamera.h"
+#include "Components/BoxComponent.h"
 
 ASecurityVideoCamera::ASecurityVideoCamera()
 {
@@ -11,7 +12,9 @@ ASecurityVideoCamera::ASecurityVideoCamera()
 	CCTVBox->SetupAttachment(RootComponent);
 	
 	CCTVSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CCTVSphere"));
-	CCTVSphere->SetupAttachment(RootComponent);	
+	CCTVSphere->SetupAttachment(RootComponent);
+
+	bUseControllerRotationYaw = true;
 }
 
 void ASecurityVideoCamera::BeginPlay()
