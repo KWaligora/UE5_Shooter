@@ -107,13 +107,6 @@ void AProjectile::Disable()
 	}
 }
 
-void AProjectile::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	
-	
-}
-
 void AProjectile::Enable()
 {
 	if (IsValid(SphereCollision))

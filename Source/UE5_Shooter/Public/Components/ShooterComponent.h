@@ -35,6 +35,10 @@ private:
 
 	UPROPERTY()
 	TArray<AProjectile*> ProjectilePool;
+	
+	/** Prevent from being garbage collected */
+	UPROPERTY()
+	TArray<AProjectile*> AllProjectiles;
 
 	void TraceUnderCrosshair(FHitResult& HitResult);
 	

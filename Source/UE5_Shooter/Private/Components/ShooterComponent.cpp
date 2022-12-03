@@ -23,7 +23,7 @@ AProjectile* UShooterComponent::GetProjectile()
 	{
 		AProjectile* Projectile = ProjectilePool.Pop();
 		if (IsValid(Projectile))
-		{
+		{			
 			Projectile->Enable();
 			return Projectile;
 		}		
@@ -88,9 +88,10 @@ AProjectile* UShooterComponent::CreateNewProjectile()
 			if (IsValid(Projectile))
 			{
 				Projectile->OnRelease.AddUObject(this, &UShooterComponent::OnReleaseToPool);
+				AllProjectiles.Add(Projectile);
 				return Projectile;
 			}			
-		}		
+		}
 	}
 	UE_LOG(LogTemp, Error, TEXT("Failed to create new projectile!"));
 	return nullptr;
@@ -98,9 +99,11 @@ AProjectile* UShooterComponent::CreateNewProjectile()
 
 void UShooterComponent::Shoot()
 {
-	AProjectile* Projectile = GetProjectile();
+	AProjectile* Projectile = GetProjectile();	
 	if (IsValid(Projectile))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Array size: %d"), AllProjectiles.Num());
+		
 		FVector FireDirection;
 		CalculateFireDirection(FireDirection);
 
@@ -119,13 +122,14 @@ void UShooterComponent::CalculateFireDirection(FVector& FireDirection)
 		TraceUnderCrosshair(HitResult);
 
 		FVector StartPoint = Owner->GetActorLocation() + Owner->GetActorForwardVector() * ProjectileSpawnOffset;
-		 
-		FireDirection = (HitResult.ImpactPoint - StartPoint).GetSafeNormal();
+		FVector EndPoint = HitResult.bBlockingHit ? HitResult.ImpactPoint : HitResult.TraceEnd; 
+		
+		FireDirection = (EndPoint - StartPoint).GetSafeNormal();
 	}
 }
 
 void UShooterComponent::OnReleaseToPool(AProjectile* Projectile)
 {
-	Projectile->Disable();
+	Projectile->Disable();	
 	ProjectilePool.Add(Projectile);
 }

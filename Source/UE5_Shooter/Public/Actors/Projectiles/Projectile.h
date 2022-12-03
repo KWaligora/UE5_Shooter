@@ -23,8 +23,6 @@ public:
 
 	virtual void PostInitializeComponents() override;
 	
-	virtual void Tick(float DeltaSeconds) override;
-	
 	void SetTimeToRelease();
 
 	void Fire(FVector Direction);
@@ -43,8 +41,9 @@ protected:
 	UProjectileMovementComponent* ProjectileMovementComponent;
 
 	UPROPERTY(EditAnywhere)
-	float FireProjectileSpeed = 600.0f;
-	
+	float FireProjectileSpeed = 3000.0f;
+
+	UFUNCTION()
 	void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 private:
