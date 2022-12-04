@@ -136,7 +136,7 @@ void UShooterComponent::AIShoot(AActor* Target)
 
 		if (IsValid(Target))
 		{
-			FVector FireDirection = Target->GetActorLocation() - StartPoint;
+			FVector FireDirection = (Target->GetActorLocation() - StartPoint).GetSafeNormal();
 			Projectile->Fire(FireDirection);
 		}		
 	}

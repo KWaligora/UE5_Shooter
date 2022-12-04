@@ -4,7 +4,9 @@
 #include "CoreMinimal.h"
 #include "SecurityVideoCamera.generated.h"
 
+class AUE5_ShooterGameMode;
 class UShooterComponent;
+
 UCLASS()
 class ASecurityVideoCamera : public APawn
 {
@@ -12,12 +14,21 @@ class ASecurityVideoCamera : public APawn
 
 public:
 	ASecurityVideoCamera();
+	virtual void PostInitializeComponents() override;
 
 	FORCEINLINE UShooterComponent* GetShooterComponent() {return ShooterComponent;}
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	UShooterComponent* ShooterComponent;	
+	UShooterComponent* ShooterComponent;
+
+	UPROPERTY()
+	AUE5_ShooterGameMode* ShooterGameMode;
+
+	virtual void BeginPlay() override;
+	
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit );
 	
 private:
 	UPROPERTY(EditDefaultsOnly)

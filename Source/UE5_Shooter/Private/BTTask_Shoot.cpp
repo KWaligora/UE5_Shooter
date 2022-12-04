@@ -8,7 +8,7 @@
 
 UBTTask_Shoot::UBTTask_Shoot()
 {
-	NodeName = "Shoot";
+	NodeName = FString("Shoot");
 }
 
 EBTNodeResult::Type UBTTask_Shoot::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -25,7 +25,7 @@ EBTNodeResult::Type UBTTask_Shoot::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 				UBlackboardComponent* BlackboardComponent = OwnerComp.GetBlackboardComponent();
 				if (IsValid(BlackboardComponent))
 				{
-					AActor* Target = Cast<AActor>(BlackboardComponent->GetValueAsObject("Player"));
+					AActor* Target = Cast<AActor>(BlackboardComponent->GetValueAsObject(FName("Player")));
 					ShooterComponent->AIShoot(Target);
 					return EBTNodeResult::Succeeded;
 				}			

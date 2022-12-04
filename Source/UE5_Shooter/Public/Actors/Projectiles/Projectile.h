@@ -20,8 +20,6 @@ public:
 	FOnRelease OnRelease;
 	
 	AProjectile();
-
-	virtual void PostInitializeComponents() override;
 	
 	void SetTimeToRelease();
 

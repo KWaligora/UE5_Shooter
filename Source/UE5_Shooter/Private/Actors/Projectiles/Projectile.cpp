@@ -15,6 +15,7 @@ AProjectile::AProjectile()
 	SphereCollision->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	SphereCollision->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	SphereCollision->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	SphereCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	SphereCollision->SetSimulatePhysics(true);
 	SetRootComponent(SphereCollision);
 
@@ -26,20 +27,6 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->InitialSpeed = 0.0f;
 	ProjectileMovementComponent->MaxSpeed = 20000.0f;
-}
-
-void AProjectile::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	if (IsValid(SphereCollision))
-	{		
-		SphereCollision->OnComponentHit.AddDynamic(this, &AProjectile::OnProjectileHit);
-		if (IsValid(Owner))
-		{
-			SphereCollision->IgnoreActorWhenMoving(Owner, true);
-		}		
-	}	
 }
 
 void AProjectile::SetTimeToRelease()
@@ -76,20 +63,6 @@ void AProjectile::Fire(FVector Direction)
 	}
 	
 	SetTimeToRelease();
-}
-
-void AProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (OnRelease.IsBound())
-	{
-		OnRelease.Broadcast(this);		
-	}
-
-	UWorld* World = GetWorld();
-	if (IsValid(World))
-	{
-		World->GetTimerManager().ClearTimer(TimeToRelease_TimerHandle);	
-	}
 }
 
 void AProjectile::Disable()
