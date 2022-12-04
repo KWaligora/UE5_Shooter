@@ -137,6 +137,10 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 	if (IsValid(ShooterGameMode) && ShooterGameMode->GetPlayerPerceptionState() == FPS)
 	{
 		Disable();
+		if (OnRelease.IsBound())
+		{
+			OnRelease.Broadcast(this);
+		}
 	}
 }
 
