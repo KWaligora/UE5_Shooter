@@ -1,5 +1,7 @@
 ﻿#include "Components/ShooterComponent.h"
 
+#include "Actors/BulletCam.h"
+#include "Actors/Projectiles/Projectile.h"
 #include "Kismet/GameplayStatics.h"
 
 UShooterComponent::UShooterComponent()
@@ -8,12 +10,37 @@ UShooterComponent::UShooterComponent()
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
+void UShooterComponent::SpawnBulletCam()
+{
+	if (IsValid(BulletCamClass))
+	{
+		UWorld* World = GetWorld();
+		if(IsValid(World))
+		{
+			FActorSpawnParameters SpawnParameters;
+			SpawnParameters.Owner = Owner;
+			BulletCam = World->SpawnActor<ABulletCam>(BulletCamClass, SpawnParameters);
+		}	
+	}
+}
+
 void UShooterComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	Owner = GetOwner();
 	ensure(Owner != nullptr);
+
+	if (bBulletCameEnabled)
+	{
+		SpawnBulletCam();		
+	}
+
+	UWorld* World = GetWorld();
+	if (IsValid(World))
+	{
+		ShooterGameMode = Cast<AUE5_ShooterGameMode>(World->GetAuthGameMode());
+	}
 }
 
 AProjectile* UShooterComponent::GetProjectile()
@@ -100,7 +127,7 @@ AProjectile* UShooterComponent::CreateNewProjectile()
 void UShooterComponent::PlayerShoot()
 {
 	AProjectile* Projectile = GetProjectile();	
-	if (IsValid(Projectile))
+	if (IsValid(Projectile) && IsValid(Owner))
 	{
 		FVector FireDirection;
 		CalculatePlayerFireDirection(FireDirection);
@@ -109,6 +136,11 @@ void UShooterComponent::PlayerShoot()
 		Projectile->SetActorLocation(StartPoint);
 		
 		Projectile->Fire(FireDirection);
+		
+		if (bBulletCameEnabled && ShooterGameMode->GetPlayerPerceptionState() == FPS && IsValid(BulletCam))
+		{
+			BulletCam->RunCamera(Projectile);
+		}
 	}
 }
 

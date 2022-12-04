@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actors/Projectiles/Projectile.h"
 #include "Components/ActorComponent.h"
 #include "ShooterComponent.generated.h"
 
+class AUE5_ShooterGameMode;
+class AProjectile;
+class ABulletCam;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UShooterComponent : public UActorComponent
@@ -15,7 +17,8 @@ class UShooterComponent : public UActorComponent
 
 public:
 	UShooterComponent();
-	
+	void SpawnBulletCam();
+
 	void PlayerShoot();
 
 	void AIShoot(AActor* Target);
@@ -27,6 +30,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float ProjectileSpawnOffset = 10.0f;
 
+	UPROPERTY()
+	ABulletCam* BulletCam;
+
 	virtual void BeginPlay() override;
 	
 	AProjectile* GetProjectile();
@@ -34,6 +40,9 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess = "true"))
 	TSubclassOf<AProjectile> ProjectileClass;
+	
+	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess = "true"))
+	TSubclassOf<ABulletCam> BulletCamClass;
 
 	UPROPERTY()
 	TArray<AProjectile*> ProjectilePool;
@@ -41,6 +50,12 @@ private:
 	/** Prevent from being garbage collected */
 	UPROPERTY()
 	TArray<AProjectile*> AllProjectiles;
+
+	UPROPERTY()
+	AUE5_ShooterGameMode* ShooterGameMode;
+
+	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess = "true") )
+	bool bBulletCameEnabled = false;
 
 	void TraceUnderCrosshair(FHitResult& HitResult);
 	

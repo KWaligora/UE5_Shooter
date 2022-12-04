@@ -1,4 +1,6 @@
 #include "SecurityVideoCamera.h"
+
+#include "Actors/Projectiles/Projectile.h"
 #include "Components/BoxComponent.h"
 #include "Components/ShooterComponent.h"
 #include "UE5_Shooter/UE5_ShooterGameMode.h"
