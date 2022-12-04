@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "UE5_Shooter/UE5_ShooterGameMode.h"
 #include "Projectile.generated.h"
 
 class USphereComponent;
@@ -20,6 +21,8 @@ public:
 	FOnRelease OnRelease;
 	
 	AProjectile();
+
+	virtual void BeginPlay() override;
 	
 	void SetTimeToRelease();
 
@@ -30,6 +33,8 @@ public:
 
 	virtual void Destroyed() override;
 
+	virtual void PostInitializeComponents() override;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* ProjectileMeshComponent;
@@ -43,9 +48,19 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float FireProjectileSpeed = 3000.0f;
 
+	UPROPERTY()
+	AUE5_ShooterGameMode* ShooterGameMode;
+
+	void OnPerceptionChange(EPlayerPerceptionState PlayerPerceptionState);
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 private:
 	float TimeToRelease = 2;
 	FVector FireDirection = FVector(0.0f, 0.0f, 0.0f);
 	
-	FTimerHandle TimeToRelease_TimerHandle;	
+	FTimerHandle TimeToRelease_TimerHandle;
+
+	EPlayerPerceptionState PlayerPerception;
 };

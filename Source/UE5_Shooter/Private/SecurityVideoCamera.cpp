@@ -56,7 +56,7 @@ void ASecurityVideoCamera::OnHit(UPrimitiveComponent* HitComponent,
 	{
 		if (IsValid(ShooterGameMode))
 		{
-			ShooterGameMode->AddPlayerPoints(1);
+			ShooterGameMode->AddPlayerPoints();
 		}
 	}
 }

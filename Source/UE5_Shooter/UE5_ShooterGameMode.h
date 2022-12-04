@@ -3,19 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ShooterTypes.h"
 #include "GameFramework/GameModeBase.h"
 #include "UI/PlayerScoreWidget.h"
 #include "UE5_ShooterGameMode.generated.h"
 
 class AShooterHUD;
-
-UENUM()
-enum EPlayerPerceptionState
-{
-	None,
-	FPS,
-	TPS,
-};
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerPerceptionChange, EPlayerPerceptionState);
 
@@ -25,12 +18,14 @@ class AUE5_ShooterGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	void AddPlayerPoints(int32 Score);
+	FOnPlayerPerceptionChange OnPlayerPerceptionChange;
+	
+	void AddPlayerPoints();
 	UPlayerScoreWidget* GetPlayerScoreWidget();
 	
 	FORCEINLINE int32 GetPlayerPoints() {return PlayerPoints;}
-
 	FORCEINLINE EPlayerPerceptionState GetPlayerPerceptionState() {return PlayerPerceptionState;}
+	
 	void TogglePerspective();
 
 protected:

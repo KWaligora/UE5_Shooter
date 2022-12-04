@@ -4,9 +4,16 @@
 
 #include "UI/ShooterHUD.h"
 
-void AUE5_ShooterGameMode::AddPlayerPoints(int32 Score)
+void AUE5_ShooterGameMode::AddPlayerPoints()
 {
-	PlayerPoints += Score;
+	if (PlayerPerceptionState == FPS)
+	{
+		PlayerPoints += 5;
+	}
+	else
+	{
+		PlayerPoints += 1;
+	}
 
 	PlayerScoreWidget = IsValid(PlayerScoreWidget) ? PlayerScoreWidget : GetPlayerScoreWidget();
 	
@@ -40,5 +47,10 @@ void AUE5_ShooterGameMode::TogglePerspective()
 	else
 	{
 		PlayerPerceptionState = TPS;
+	}
+
+	if (OnPlayerPerceptionChange.IsBound())
+	{
+		OnPlayerPerceptionChange.Broadcast(PlayerPerceptionState);
 	}
 }

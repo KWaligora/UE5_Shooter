@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 
-/**
- * 
- */
-class UE5_SHOOTER_API ShooterTypes
+UENUM()
+enum EPlayerPerceptionState
 {
-public:
-	ShooterTypes();
-	~ShooterTypes();
+	None,
+	FPS,
+	TPS,
 };
+
+

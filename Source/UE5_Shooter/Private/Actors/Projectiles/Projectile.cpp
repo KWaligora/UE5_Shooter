@@ -2,6 +2,7 @@
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "UE5_Shooter/UE5_ShooterGameMode.h"
 
 AProjectile::AProjectile()
 {
@@ -29,6 +30,17 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent->MaxSpeed = 20000.0f;
 }
 
+void AProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UWorld* World = GetWorld();
+	if (IsValid(World))
+	{
+		ShooterGameMode = Cast<AUE5_ShooterGameMode>(World->GetAuthGameMode()); 
+	}	
+}
+
 void AProjectile::SetTimeToRelease()
 {
 	UWorld* World = GetWorld();
@@ -52,32 +64,19 @@ void AProjectile::SetTimeToRelease()
 
 void AProjectile::Fire(FVector Direction)
 {
-	FireDirection = Direction;
+	FireDirection = Direction;	
 	
-	// Tick uses ProjectileMovementComponent so it must be valid
 	if (IsValid(ProjectileMovementComponent))
-	{
+	{		
 		ProjectileMovementComponent->Velocity = FireDirection * FireProjectileSpeed;
 		ProjectileMovementComponent->UpdateComponentVelocity();
-		ProjectileMovementComponent->UpdatedPrimitive->SetPhysicsLinearVelocity(ProjectileMovementComponent->Velocity);
+		if (IsValid(ProjectileMovementComponent->UpdatedPrimitive) && ProjectileMovementComponent->UpdatedPrimitive->IsSimulatingPhysics())
+		{
+			ProjectileMovementComponent->UpdatedPrimitive->SetPhysicsLinearVelocity(ProjectileMovementComponent->Velocity);
+		}		
 	}
 	
 	SetTimeToRelease();
-}
-
-void AProjectile::Disable()
-{
-	PrimaryActorTick.SetTickFunctionEnable(false);
-	
-	if (IsValid(SphereCollision))
-	{
-		SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-
-	if (IsValid(ProjectileMeshComponent))
-	{
-		ProjectileMeshComponent->SetVisibility(false);
-	}
 }
 
 void AProjectile::Destroyed()
@@ -92,6 +91,55 @@ void AProjectile::Destroyed()
 	}
 }
 
+void AProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	UWorld* World = GetWorld();
+	if (IsValid(World))
+	{
+		ShooterGameMode = Cast<AUE5_ShooterGameMode>(World->GetAuthGameMode());
+		if (IsValid(ShooterGameMode))
+		{
+			ShooterGameMode->OnPlayerPerceptionChange.AddUObject(this, &AProjectile::OnPerceptionChange);
+		}
+	}
+
+	if (IsValid(SphereCollision))
+	{
+		SphereCollision->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	}
+
+	SphereCollision->IgnoreActorWhenMoving(Owner, true);
+}
+
+void AProjectile::OnPerceptionChange(EPlayerPerceptionState PlayerPerceptionState)
+{
+	PlayerPerception = PlayerPerceptionState;
+	if (PlayerPerception == FPS)
+	{
+		ProjectileMovementComponent->bShouldBounce = false;
+	}
+	else
+	{
+		ProjectileMovementComponent->bShouldBounce = true;
+	}
+}
+
+void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor == Owner || OtherActor->IsA(StaticClass()))
+	{
+		return;
+	}
+	
+	if (IsValid(ShooterGameMode) && ShooterGameMode->GetPlayerPerceptionState() == FPS)
+	{
+		Disable();
+	}
+}
+
 void AProjectile::Enable()
 {
 	if (IsValid(SphereCollision))
@@ -102,6 +150,19 @@ void AProjectile::Enable()
 	if (IsValid(ProjectileMeshComponent))
 	{
 		ProjectileMeshComponent->SetVisibility(true);
+	}
+}
+
+void AProjectile::Disable()
+{	
+	if (IsValid(SphereCollision))
+	{
+		SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	if (IsValid(ProjectileMeshComponent))
+	{
+		ProjectileMeshComponent->SetVisibility(false);		
 	}
 }
 
