@@ -74,6 +74,9 @@ void AUE5_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 	PlayerInputComponent->BindAction("TogglePerspective", IE_Pressed, this, &AUE5_ShooterCharacter::TogglePerspective);
 
+	PlayerInputComponent->BindAction("ZoomIn", IE_Pressed, this, &AUE5_ShooterCharacter::ZoomIn);
+	PlayerInputComponent->BindAction("ZoomOut", IE_Pressed, this, &AUE5_ShooterCharacter::ZoomOut);
+
 	PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AUE5_ShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("Move Right / Left", this, &AUE5_ShooterCharacter::MoveRight);
 
@@ -84,6 +87,22 @@ void AUE5_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAxis("Turn Right / Left Gamepad", this, &AUE5_ShooterCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("Look Up / Down Gamepad", this, &AUE5_ShooterCharacter::LookUpAtRate);
+}
+
+void AUE5_ShooterCharacter::ZoomIn()
+{
+	if(IsValid(FPSCamera) && FPSCamera->IsActive())
+	{
+		FPSCamera->SetFieldOfView(45.0f);
+	}
+}
+
+void AUE5_ShooterCharacter::ZoomOut()
+{
+	if(IsValid(FPSCamera) && FPSCamera->IsActive())
+	{
+		FPSCamera->SetFieldOfView(90.0f);
+	}
 }
 
 void AUE5_ShooterCharacter::Shoot()

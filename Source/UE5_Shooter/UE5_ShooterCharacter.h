@@ -56,6 +56,9 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void ZoomIn();
+	void ZoomOut();
+	
 	void Shoot();
 	
 	void TogglePerspective();
