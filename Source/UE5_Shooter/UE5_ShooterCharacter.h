@@ -26,7 +26,7 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return TPSCamera; }
 
-protected:
+protected:	
 	UPROPERTY(EditDefaultsOnly)
 	UShooterComponent* ShooterComponent;
 
@@ -62,5 +62,8 @@ protected:
 	
 	void ActivateFPSCamera();
 	void ActivateTPSCamera();
+	
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };
 

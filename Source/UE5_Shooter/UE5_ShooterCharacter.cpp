@@ -118,6 +118,18 @@ void AUE5_ShooterCharacter::ActivateTPSCamera()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
+void AUE5_ShooterCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                                  FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor->IsA(AProjectile::StaticClass()))
+	{
+		Controller->UnPossess();
+		GetMesh()->SetSimulatePhysics(true);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SetLifeSpan(5.0f);
+	}
+}
+
 void AUE5_ShooterCharacter::TogglePerspective()
 {
 	if (IsValid(ShooterGameMode))
@@ -162,6 +174,12 @@ void AUE5_ShooterCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	ShooterGameMode = GetGameMode();
+	
+	UCapsuleComponent* CP = GetCapsuleComponent();
+	if (IsValid(CP))
+	{
+		CP->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	}
 }
 
 void AUE5_ShooterCharacter::MoveForward(float Value)
