@@ -16,7 +16,9 @@ class UShooterComponent : public UActorComponent
 public:
 	UShooterComponent();
 	
-	void Shoot();
+	void PlayerShoot();
+
+	void AIShoot(AActor* Target);
 
 protected:
 	UPROPERTY()
@@ -43,7 +45,7 @@ private:
 	void TraceUnderCrosshair(FHitResult& HitResult);
 	
 	AProjectile* CreateNewProjectile();
-	void CalculateFireDirection(FVector& FireDirection);
+	void CalculatePlayerFireDirection(FVector& FireDirection);
 
 	UFUNCTION()
 	void OnReleaseToPool(AProjectile* Projectile);	

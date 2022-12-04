@@ -82,7 +82,7 @@ void AUE5_ShooterCharacter::Shoot()
 {
 	if(IsValid(ShooterComponent))
 	{
-		ShooterComponent->Shoot();
+		ShooterComponent->PlayerShoot();
 	}
 }
 

@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "SecurityVideoCamera.generated.h"
 
+class UShooterComponent;
 UCLASS()
 class ASecurityVideoCamera : public APawn
 {
@@ -11,11 +12,12 @@ class ASecurityVideoCamera : public APawn
 
 public:
 	ASecurityVideoCamera();
-	
-	virtual void Tick(float DeltaTime) override;    
 
-protected:	
-	virtual void BeginPlay() override;
+	FORCEINLINE UShooterComponent* GetShooterComponent() {return ShooterComponent;}
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	UShooterComponent* ShooterComponent;	
 	
 private:
 	UPROPERTY(EditDefaultsOnly)

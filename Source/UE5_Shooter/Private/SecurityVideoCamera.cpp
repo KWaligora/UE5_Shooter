@@ -1,5 +1,6 @@
 #include "SecurityVideoCamera.h"
 #include "Components/BoxComponent.h"
+#include "Components/ShooterComponent.h"
 
 ASecurityVideoCamera::ASecurityVideoCamera()
 {
@@ -14,16 +15,8 @@ ASecurityVideoCamera::ASecurityVideoCamera()
 	CCTVSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CCTVSphere"));
 	CCTVSphere->SetupAttachment(RootComponent);
 
+	ShooterComponent = CreateDefaultSubobject<UShooterComponent>(TEXT("ShooterComponent"));
+
 	bUseControllerRotationYaw = true;
-}
-
-void ASecurityVideoCamera::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void ASecurityVideoCamera::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 

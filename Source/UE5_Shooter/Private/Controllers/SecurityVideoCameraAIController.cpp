@@ -37,9 +37,20 @@ void ASecurityVideoCameraAIController::BeginPlay()
 
 void ASecurityVideoCameraAIController::OnPerceptionUpdate(AActor* Actor, FAIStimulus Stimulus)
 {
-	AUE5_ShooterCharacter* ShooterCharacter = Cast<AUE5_ShooterCharacter>(Actor);
-	if (IsValid(ShooterCharacter) && IsValid(BlackboardComponent))
+	if (Stimulus.WasSuccessfullySensed())
 	{
-		BlackboardComponent->SetValueAsObject("Player", ShooterCharacter);			
+		AUE5_ShooterCharacter* ShooterCharacter = Cast<AUE5_ShooterCharacter>(Actor);
+		if (IsValid(ShooterCharacter) && IsValid(BlackboardComponent))
+		{
+			BlackboardComponent->SetValueAsObject(FName("Player"), ShooterCharacter);			
+		}
 	}
+	else
+	{
+		if (IsValid(BlackboardComponent))
+		{
+			BlackboardComponent->ClearValue(FName("Player"));			
+		}
+	}
+	
 }

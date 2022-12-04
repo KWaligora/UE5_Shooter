@@ -97,24 +97,22 @@ AProjectile* UShooterComponent::CreateNewProjectile()
 	return nullptr;
 }
 
-void UShooterComponent::Shoot()
+void UShooterComponent::PlayerShoot()
 {
 	AProjectile* Projectile = GetProjectile();	
 	if (IsValid(Projectile))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Array size: %d"), AllProjectiles.Num());
-		
 		FVector FireDirection;
-		CalculateFireDirection(FireDirection);
+		CalculatePlayerFireDirection(FireDirection);
 
 		FVector StartPoint = Owner->GetActorLocation() + Owner->GetActorForwardVector() * ProjectileSpawnOffset;
 		Projectile->SetActorLocation(StartPoint);
 		
 		Projectile->Fire(FireDirection);
-	}	
+	}
 }
 
-void UShooterComponent::CalculateFireDirection(FVector& FireDirection)
+void UShooterComponent::CalculatePlayerFireDirection(FVector& FireDirection)
 {
 	if (IsValid(Owner))
 	{
@@ -125,6 +123,22 @@ void UShooterComponent::CalculateFireDirection(FVector& FireDirection)
 		FVector EndPoint = HitResult.bBlockingHit ? HitResult.ImpactPoint : HitResult.TraceEnd; 
 		
 		FireDirection = (EndPoint - StartPoint).GetSafeNormal();
+	}
+}
+
+void UShooterComponent::AIShoot(AActor* Target)
+{
+	AProjectile* Projectile = GetProjectile();
+	if (IsValid(Projectile))
+	{
+		FVector StartPoint = Owner->GetActorLocation() + Owner->GetActorForwardVector() * ProjectileSpawnOffset;
+		Projectile->SetActorLocation(StartPoint);
+
+		if (IsValid(Target))
+		{
+			FVector FireDirection = Target->GetActorLocation() - StartPoint;
+			Projectile->Fire(FireDirection);
+		}		
 	}
 }
 

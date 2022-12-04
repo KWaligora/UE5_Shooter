@@ -9,6 +9,6 @@ public class UE5_Shooter : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] {"AnimGraphRuntime"});
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "GameplayTasks" });
 	}
 }

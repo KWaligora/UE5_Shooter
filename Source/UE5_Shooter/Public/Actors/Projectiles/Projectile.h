@@ -30,6 +30,8 @@ public:
 	void Enable();
 	void Disable();
 
+	virtual void Destroyed() override;
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* ProjectileMeshComponent;

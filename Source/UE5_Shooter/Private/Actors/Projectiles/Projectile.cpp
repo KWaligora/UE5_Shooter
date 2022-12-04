@@ -88,7 +88,7 @@ void AProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* Oth
 	UWorld* World = GetWorld();
 	if (IsValid(World))
 	{
-		World->GetTimerManager().ClearTimer(TimeToRelease_TimerHandle);
+		World->GetTimerManager().ClearTimer(TimeToRelease_TimerHandle);	
 	}
 }
 
@@ -104,6 +104,18 @@ void AProjectile::Disable()
 	if (IsValid(ProjectileMeshComponent))
 	{
 		ProjectileMeshComponent->SetVisibility(false);
+	}
+}
+
+void AProjectile::Destroyed()
+{
+	Super::Destroyed();
+
+	UWorld* World = GetWorld();
+	if (IsValid(World))
+	{
+		World->GetTimerManager().ClearTimer(TimeToRelease_TimerHandle);
+		OnRelease.Clear();
 	}
 }
 
