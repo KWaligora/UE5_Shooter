@@ -43,9 +43,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float FireProjectileSpeed = 3000.0f;
 
-	UFUNCTION()
-	void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
 private:
 	float TimeToRelease = 2;
 	FVector FireDirection = FVector(0.0f, 0.0f, 0.0f);

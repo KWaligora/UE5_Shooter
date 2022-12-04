@@ -30,3 +30,15 @@ UPlayerScoreWidget* AUE5_ShooterGameMode::GetPlayerScoreWidget()
 	}
 	return nullptr;
 }
+
+void AUE5_ShooterGameMode::TogglePerspective()
+{
+	if(PlayerPerceptionState == TPS)
+	{
+		PlayerPerceptionState = FPS;
+	}
+	else
+	{
+		PlayerPerceptionState = TPS;
+	}
+}

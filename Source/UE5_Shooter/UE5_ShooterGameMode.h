@@ -9,6 +9,16 @@
 
 class AShooterHUD;
 
+UENUM()
+enum EPlayerPerceptionState
+{
+	None,
+	FPS,
+	TPS,
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerPerceptionChange, EPlayerPerceptionState);
+
 UCLASS(minimalapi)
 class AUE5_ShooterGameMode : public AGameModeBase
 {
@@ -17,11 +27,16 @@ class AUE5_ShooterGameMode : public AGameModeBase
 public:
 	void AddPlayerPoints(int32 Score);
 	UPlayerScoreWidget* GetPlayerScoreWidget();
-
+	
 	FORCEINLINE int32 GetPlayerPoints() {return PlayerPoints;}
+
+	FORCEINLINE EPlayerPerceptionState GetPlayerPerceptionState() {return PlayerPerceptionState;}
+	void TogglePerspective();
 
 protected:
 	int32 PlayerPoints = 0;
+
+	EPlayerPerceptionState PlayerPerceptionState = TPS;
 
 	UPROPERTY()
 	UPlayerScoreWidget* PlayerScoreWidget;

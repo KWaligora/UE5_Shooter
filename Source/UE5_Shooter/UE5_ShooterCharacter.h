@@ -6,14 +6,8 @@
 #include "GameFramework/Character.h"
 #include "UE5_ShooterCharacter.generated.h"
 
+class UCameraComponent;
 class UShooterComponent;
-UENUM()
-enum EPerceptionState
-{
-	None,
-	FPS,
-	TPS,
-};
 
 UCLASS(config=Game)
 class AUE5_ShooterCharacter : public ACharacter
@@ -28,23 +22,28 @@ public:
 	float TurnRateGamepad;
 
 	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return TPSCameraBoom; }
 	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return TPSCamera; }
 
 protected:
-	EPerceptionState PerceptionState = TPS;
-
 	UPROPERTY(EditDefaultsOnly)
 	UShooterComponent* ShooterComponent;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	class USpringArmComponent* CameraBoom;
-
+	class USpringArmComponent* TPSCameraBoom;
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	class UCameraComponent* FollowCamera;
+	UCameraComponent* TPSCamera;
+
+	UPROPERTY(VisibleAnywhere, Category="Camera")
+	UCameraComponent* FPSCamera;
+	
+	UPROPERTY()
+	class AUE5_ShooterGameMode* ShooterGameMode;
+
+	virtual void BeginPlay() override;
 	
 	void MoveForward(float Value);
 	
@@ -53,9 +52,15 @@ protected:
 	void TurnAtRate(float Rate);
 	
 	void LookUpAtRate(float Rate);
-	
+	AUE5_ShooterGameMode* GetGameMode();
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void Shoot();
+	
+	void TogglePerspective();
+	
+	void ActivateFPSCamera();
+	void ActivateTPSCamera();
 };
 

@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UE5_ShooterCharacter.h"
+
+#include "UE5_ShooterGameMode.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -38,15 +40,19 @@ AUE5_ShooterCharacter::AUE5_ShooterCharacter()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	TPSCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("TPSCameraBoom"));
+	TPSCameraBoom->SetupAttachment(RootComponent);
+	TPSCameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	TPSCameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	TPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowTPSCamera"));
+	TPSCamera->SetupAttachment(TPSCameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	TPSCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
+	FPSCamera->SetupAttachment(GetMesh());
+	FPSCamera->bUsePawnControlRotation = true;
 	
 	ShooterComponent = CreateDefaultSubobject<UShooterComponent>(TEXT("ShooterComponent"));
 
@@ -65,6 +71,8 @@ void AUE5_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUE5_ShooterCharacter::Shoot);
+
+	PlayerInputComponent->BindAction("TogglePerspective", IE_Pressed, this, &AUE5_ShooterCharacter::TogglePerspective);
 
 	PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AUE5_ShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("Move Right / Left", this, &AUE5_ShooterCharacter::MoveRight);
@@ -86,6 +94,47 @@ void AUE5_ShooterCharacter::Shoot()
 	}
 }
 
+void AUE5_ShooterCharacter::ActivateFPSCamera()
+{
+	FPSCamera->SetActive(true);
+	TPSCamera->SetActive(false);
+			
+	bUseControllerRotationPitch = true;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationRoll = true;
+
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+}
+
+void AUE5_ShooterCharacter::ActivateTPSCamera()
+{
+	FPSCamera->SetActive(false);
+	TPSCamera->SetActive(true);
+			
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+}
+
+void AUE5_ShooterCharacter::TogglePerspective()
+{
+	if (IsValid(ShooterGameMode))
+	{
+		ShooterGameMode->TogglePerspective();
+
+		if (TPSCamera->IsActive())
+		{
+			ActivateFPSCamera();
+		}
+		else
+		{
+			ActivateTPSCamera();	
+		}
+	}
+}
+
 void AUE5_ShooterCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
@@ -96,6 +145,23 @@ void AUE5_ShooterCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
+}
+
+AUE5_ShooterGameMode* AUE5_ShooterCharacter::GetGameMode()
+{
+	UWorld* World = GetWorld();
+	if (IsValid(World))
+	{
+		return Cast<AUE5_ShooterGameMode>(World->GetAuthGameMode());
+	}
+	return nullptr;
+}
+
+void AUE5_ShooterCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ShooterGameMode = GetGameMode();
 }
 
 void AUE5_ShooterCharacter::MoveForward(float Value)
