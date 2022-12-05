@@ -57,7 +57,8 @@ protected:
 	AUE5_ShooterGameMode* GetGameMode();
 
 	void SetupProjectilePrediction();
-	
+
+	void PrepareToShoot();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void ZoomIn();

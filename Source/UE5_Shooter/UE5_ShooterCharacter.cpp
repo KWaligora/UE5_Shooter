@@ -21,6 +21,9 @@ AUE5_ShooterCharacter::AUE5_ShooterCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
+
 	// set our turn rate for input
 	TurnRateGamepad = 50.f;
 
@@ -72,7 +75,7 @@ void AUE5_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUE5_ShooterCharacter::SetupProjectilePrediction);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUE5_ShooterCharacter::PrepareToShoot);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AUE5_ShooterCharacter::Shoot);
 
 	PlayerInputComponent->BindAction("TogglePerspective", IE_Pressed, this, &AUE5_ShooterCharacter::TogglePerspective);
@@ -142,14 +145,20 @@ void AUE5_ShooterCharacter::SetupProjectilePrediction()
 				{
 					DrawDebugLine(World, Points[i], Points[i+1], FColor::Red, false, -1, 0,2.0f);
 				}				
-		}	
+			}	
 		}
-	}
-	
+	}	
+}
+
+void AUE5_ShooterCharacter::PrepareToShoot()
+{
+	SetActorTickEnabled(true);
 }
 
 void AUE5_ShooterCharacter::Shoot()
 {
+	SetActorTickEnabled(false);
+	
 	if(IsValid(ShooterComponent))
 	{
 		ShooterComponent->PlayerShoot();

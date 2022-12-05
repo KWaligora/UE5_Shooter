@@ -42,6 +42,15 @@ void UShooterComponent::BeginPlay()
 	{
 		ShooterGameMode = Cast<AUE5_ShooterGameMode>(World->GetAuthGameMode());
 	}
+
+	AProjectile* Projectile = GetProjectile();
+	if (IsValid(Projectile))
+	{
+		ProjectileSpeed = Projectile->GetProjectileFireSpeed();
+		ProjectileSphereRadius = Projectile->GetSphereComponent()->GetScaledSphereRadius();
+		
+		OnReleaseToPool(Projectile);
+	}
 }
 
 AProjectile* UShooterComponent::GetProjectile()
@@ -62,19 +71,15 @@ AProjectile* UShooterComponent::GetProjectile()
 }
 
 void UShooterComponent::GetPredictProjectilePathParams(FPredictProjectilePathParams& PredictProjectilePathParams)
-{
-	AProjectile* Projectile = GetProjectile();
-		
+{		
 	FVector FireDirection;
 	CalculatePlayerFireDirection(FireDirection);
 	
-	PredictProjectilePathParams.LaunchVelocity = Projectile->GetProjectileFireSpeed() * FireDirection; 
+	PredictProjectilePathParams.LaunchVelocity = ProjectileSpeed * FireDirection; 
 	PredictProjectilePathParams.bTraceComplex = true;
 	PredictProjectilePathParams.DrawDebugType = EDrawDebugTrace::None;
-	PredictProjectilePathParams.ProjectileRadius = Projectile->GetSphereComponent()->GetScaledSphereRadius();
+	PredictProjectilePathParams.ProjectileRadius = ProjectileSphereRadius;
 	PredictProjectilePathParams.StartLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * ProjectileSpawnOffset;
-	/*PredictProjectilePathParams.TraceChannel = ECC_Visibility;
-	PredictProjectilePathParams.bTraceWithChannel = true;*/
 	PredictProjectilePathParams.bTraceWithCollision = true;
 	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery1);
 	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery2);
@@ -89,10 +94,9 @@ void UShooterComponent::GetPredictProjectilePathParams(FPredictProjectilePathPar
 	for (AProjectile* P : AllProjectiles)
 	{
 		PredictProjectilePathParams.ActorsToIgnore.Add(P);
-	}	
+	}
+	
 	PredictProjectilePathParams.ActorsToIgnore.Add(Owner);
-
-	OnReleaseToPool(Projectile);
 }
 
 void UShooterComponent::TraceUnderCrosshair(FHitResult& HitResult)

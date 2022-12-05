@@ -67,4 +67,7 @@ private:
 
 	UFUNCTION()
 	void OnReleaseToPool(AProjectile* Projectile);	
+	
+	float ProjectileSpeed = 0;
+	float ProjectileSphereRadius = 0;
 };
