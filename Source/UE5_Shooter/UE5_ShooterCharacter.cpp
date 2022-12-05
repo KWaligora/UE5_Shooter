@@ -169,10 +169,8 @@ void AUE5_ShooterCharacter::ActivateFPSCamera()
 {
 	FPSCamera->SetActive(true);
 	TPSCamera->SetActive(false);
-			
-	bUseControllerRotationPitch = true;
-	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = true;
+
+	bUseControllerRotationYaw = true;	
 
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
@@ -181,10 +179,8 @@ void AUE5_ShooterCharacter::ActivateTPSCamera()
 {
 	FPSCamera->SetActive(false);
 	TPSCamera->SetActive(true);
-			
-	bUseControllerRotationPitch = false;
+	
 	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
