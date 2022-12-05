@@ -179,7 +179,7 @@ void UShooterComponent::PlayerShoot()
 		
 		if (bBulletCameEnabled && ShooterGameMode->GetPlayerPerceptionState() == FPS && IsValid(BulletCam))
 		{
-			BulletCam->RunCamera(Projectile);
+			BulletCam->RunCamera(Projectile, FireDirection);
 		}
 	}
 }

@@ -19,7 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	ABulletCam();
 
-	void RunCamera(AProjectile* Projectile);
+	void RunCamera(AProjectile* Projectile, FVector Direction);
 
 	UFUNCTION()
 	void OnRelease(AProjectile* Projectile);

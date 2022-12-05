@@ -23,13 +23,13 @@ void ABulletCam::BeginPlay()
 	}
 }
 
-
-void ABulletCam::RunCamera(AProjectile* Projectile)
+void ABulletCam::RunCamera(AProjectile* Projectile, FVector Direction)
 {
 	if (IsValid(Projectile))
 	{
 		OnRelease_DelegateHandle = Projectile->OnRelease.AddUObject(this, &ABulletCam::OnRelease);
 		AttachToActor(Projectile, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		SetActorRotation(Direction.Rotation());
 		ShooterPlayerController->SetViewTargetWithBlend(this);
 	}
 }
