@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AUE5_ShooterCharacter
@@ -71,7 +72,8 @@ void AUE5_ShooterCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUE5_ShooterCharacter::Shoot);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUE5_ShooterCharacter::SetupProjectilePrediction);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AUE5_ShooterCharacter::Shoot);
 
 	PlayerInputComponent->BindAction("TogglePerspective", IE_Pressed, this, &AUE5_ShooterCharacter::TogglePerspective);
 
@@ -104,6 +106,46 @@ void AUE5_ShooterCharacter::ZoomOut()
 	{
 		FPSCamera->SetFieldOfView(90.0f);
 	}
+}
+
+
+void AUE5_ShooterCharacter::SetupProjectilePrediction()
+{
+	UWorld* World = GetWorld();
+	if (IsValid(World))
+	{
+		if (IsValid(ShooterComponent))
+		{
+			FPredictProjectilePathParams PredictProjectilePathParams;
+			ShooterComponent->GetPredictProjectilePathParams(PredictProjectilePathParams);
+
+			TArray<FVector> Points;
+
+			FPredictProjectilePathResult PredictProjectilePathResult;
+			for (int i=0; i<5; i++)
+			{
+				UGameplayStatics::PredictProjectilePath(World, PredictProjectilePathParams, PredictProjectilePathResult);				
+				
+				if(PredictProjectilePathResult.HitResult.IsValidBlockingHit())
+				{					
+					Points.Add(PredictProjectilePathResult.HitResult.ImpactPoint);					
+					
+					FVector NewVelocity = PredictProjectilePathResult.HitResult.ImpactNormal.GetSafeNormal() * PredictProjectilePathResult.LastTraceDestination.Velocity.Length();
+					
+					PredictProjectilePathParams.StartLocation = PredictProjectilePathResult.HitResult.ImpactPoint;
+					PredictProjectilePathParams.LaunchVelocity = NewVelocity;													
+				}				
+			}
+			if (Points.Num() > 2)
+			{
+				for (int i=0; i<Points.Num() - 1; i++)
+				{
+					DrawDebugLine(World, Points[i], Points[i+1], FColor::Red, false, -1, 0,2.0f);
+				}				
+		}	
+		}
+	}
+	
 }
 
 void AUE5_ShooterCharacter::Shoot()
@@ -200,6 +242,13 @@ void AUE5_ShooterCharacter::BeginPlay()
 	{
 		CP->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
 	}
+}
+
+void AUE5_ShooterCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	SetupProjectilePrediction();
 }
 
 void AUE5_ShooterCharacter::MoveForward(float Value)

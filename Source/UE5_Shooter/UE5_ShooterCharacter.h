@@ -17,6 +17,8 @@ class AUE5_ShooterCharacter : public ACharacter
 public:
 	AUE5_ShooterCharacter();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
 	float TurnRateGamepad;
@@ -54,6 +56,8 @@ protected:
 	void LookUpAtRate(float Rate);
 	AUE5_ShooterGameMode* GetGameMode();
 
+	void SetupProjectilePrediction();
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void ZoomIn();

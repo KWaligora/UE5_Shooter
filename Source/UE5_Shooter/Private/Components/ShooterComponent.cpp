@@ -2,6 +2,7 @@
 
 #include "Actors/BulletCam.h"
 #include "Actors/Projectiles/Projectile.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 UShooterComponent::UShooterComponent()
@@ -60,6 +61,40 @@ AProjectile* UShooterComponent::GetProjectile()
 	return CreateNewProjectile();
 }
 
+void UShooterComponent::GetPredictProjectilePathParams(FPredictProjectilePathParams& PredictProjectilePathParams)
+{
+	AProjectile* Projectile = GetProjectile();
+		
+	FVector FireDirection;
+	CalculatePlayerFireDirection(FireDirection);
+	
+	PredictProjectilePathParams.LaunchVelocity = Projectile->GetProjectileFireSpeed() * FireDirection; 
+	PredictProjectilePathParams.bTraceComplex = true;
+	PredictProjectilePathParams.DrawDebugType = EDrawDebugTrace::None;
+	PredictProjectilePathParams.ProjectileRadius = Projectile->GetSphereComponent()->GetScaledSphereRadius();
+	PredictProjectilePathParams.StartLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * ProjectileSpawnOffset;
+	/*PredictProjectilePathParams.TraceChannel = ECC_Visibility;
+	PredictProjectilePathParams.bTraceWithChannel = true;*/
+	PredictProjectilePathParams.bTraceWithCollision = true;
+	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery1);
+	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery2);
+	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery3);
+	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery4);
+	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery5);
+	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery6);
+	PredictProjectilePathParams.ObjectTypes.Add(ObjectTypeQuery7);
+
+	PredictProjectilePathParams.ActorsToIgnore.Empty();
+	
+	for (AProjectile* P : AllProjectiles)
+	{
+		PredictProjectilePathParams.ActorsToIgnore.Add(P);
+	}	
+	PredictProjectilePathParams.ActorsToIgnore.Add(Owner);
+
+	OnReleaseToPool(Projectile);
+}
+
 void UShooterComponent::TraceUnderCrosshair(FHitResult& HitResult)
 {
 FVector2d ViewportSize;
@@ -113,7 +148,8 @@ AProjectile* UShooterComponent::CreateNewProjectile()
 			FVector StartPoint = Owner->GetActorLocation() + Owner->GetActorForwardVector() * ProjectileSpawnOffset;
 			AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, StartPoint, FRotator::ZeroRotator, SpawnParameters);
 			if (IsValid(Projectile))
-			{
+			{				
+				
 				Projectile->OnRelease.AddUObject(this, &UShooterComponent::OnReleaseToPool);
 				AllProjectiles.Add(Projectile);
 				return Projectile;

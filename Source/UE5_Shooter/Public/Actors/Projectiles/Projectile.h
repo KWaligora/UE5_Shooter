@@ -34,6 +34,9 @@ public:
 	virtual void Destroyed() override;
 
 	virtual void PostInitializeComponents() override;
+
+	FORCEINLINE float GetProjectileFireSpeed() {return FireProjectileSpeed;}
+	FORCEINLINE const USphereComponent* GetSphereComponent() {return SphereCollision;}
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)

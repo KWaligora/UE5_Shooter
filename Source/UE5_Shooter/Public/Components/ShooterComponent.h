@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Kismet/GameplayStaticsTypes.h"
 #include "ShooterComponent.generated.h"
 
 class AUE5_ShooterGameMode;
@@ -23,6 +24,8 @@ public:
 
 	void AIShoot(AActor* Target);
 
+	void GetPredictProjectilePathParams(FPredictProjectilePathParams& PredictProjectilePathParams);
+	
 protected:
 	UPROPERTY()
 	AActor* Owner;
@@ -56,7 +59,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess = "true") )
 	bool bBulletCameEnabled = false;
-
+	
 	void TraceUnderCrosshair(FHitResult& HitResult);
 	
 	AProjectile* CreateNewProjectile();
