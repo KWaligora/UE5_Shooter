@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "Perception/AIPerceptionTypes.h"
+#include "UE5_Shooter/UE5_ShooterGameMode.h"
 #include "SecurityVideoCameraAIController.generated.h"
 
 /**
@@ -30,6 +31,9 @@ protected:
 
 	UPROPERTY()
 	UBlackboardComponent* BlackboardComponent;
+
+	UFUNCTION()
+	void OnPlayerPerspectiveChange(EPlayerPerceptionState NewState);
 
 	virtual void BeginPlay() override;
 	

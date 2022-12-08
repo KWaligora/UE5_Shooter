@@ -18,6 +18,14 @@ ASecurityVideoCamera::ASecurityVideoCamera()
 	BoxComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	SetRootComponent(BoxComponent);
 	
+	HitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBoxComponent"));
+	HitBox->SetupAttachment(RootComponent);
+
+	// Should create ECC_Projectile but there is no time left ;C
+	HitBox->SetCollisionObjectType(ECC_PhysicsBody);
+	HitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	HitBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+	
 	CCTVBox = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CCTVBox"));
 	CCTVBox->SetupAttachment(RootComponent);
 	
@@ -33,9 +41,9 @@ void ASecurityVideoCamera::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (IsValid(BoxComponent))
+	if (IsValid(HitBox))
 	{
-		BoxComponent->OnComponentHit.AddDynamic(this, &ASecurityVideoCamera::OnHit);
+		HitBox->OnComponentBeginOverlap.AddDynamic(this, &ASecurityVideoCamera::OnBeginOverlap);
 	}	
 }
 
@@ -50,8 +58,7 @@ void ASecurityVideoCamera::BeginPlay()
 	}
 }
 
-void ASecurityVideoCamera::OnHit(UPrimitiveComponent* HitComponent,
-                                 AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ASecurityVideoCamera::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	AProjectile* Projectile = Cast<AProjectile>(OtherActor);
 	if (IsValid(Projectile))

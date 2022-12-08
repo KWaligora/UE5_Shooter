@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 
-UENUM()
-enum EPlayerPerceptionState
+UENUM(BlueprintType)
+enum class EPlayerPerceptionState : uint8
 {
 	None,
 	FPS,

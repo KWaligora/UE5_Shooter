@@ -6,7 +6,7 @@
 
 void AUE5_ShooterGameMode::AddPlayerPoints()
 {
-	if (PlayerPerceptionState == FPS)
+	if (PlayerPerceptionState == EPlayerPerceptionState::FPS)
 	{
 		PlayerPoints += 5;
 	}
@@ -19,7 +19,7 @@ void AUE5_ShooterGameMode::AddPlayerPoints()
 	
 	if (IsValid(PlayerScoreWidget))
 	{
-		PlayerScoreWidget->SetScore(PlayerPoints++);
+		PlayerScoreWidget->SetScore(PlayerPoints);
 	}
 }
 
@@ -40,13 +40,13 @@ UPlayerScoreWidget* AUE5_ShooterGameMode::GetPlayerScoreWidget()
 
 void AUE5_ShooterGameMode::TogglePerspective()
 {
-	if(PlayerPerceptionState == TPS)
+	if(PlayerPerceptionState == EPlayerPerceptionState::TPS)
 	{
-		PlayerPerceptionState = FPS;
+		PlayerPerceptionState = EPlayerPerceptionState::FPS;
 	}
 	else
 	{
-		PlayerPerceptionState = TPS;
+		PlayerPerceptionState = EPlayerPerceptionState::TPS;
 	}
 
 	if (OnPlayerPerceptionChange.IsBound())

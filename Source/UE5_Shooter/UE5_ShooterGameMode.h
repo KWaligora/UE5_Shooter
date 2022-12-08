@@ -31,7 +31,7 @@ public:
 protected:
 	int32 PlayerPoints = 0;
 
-	EPlayerPerceptionState PlayerPerceptionState = TPS;
+	EPlayerPerceptionState PlayerPerceptionState = EPlayerPerceptionState::TPS;
 
 	UPROPERTY()
 	UPlayerScoreWidget* PlayerScoreWidget;

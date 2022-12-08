@@ -116,7 +116,7 @@ void AProjectile::PostInitializeComponents()
 void AProjectile::OnPerceptionChange(EPlayerPerceptionState PlayerPerceptionState)
 {
 	PlayerPerception = PlayerPerceptionState;
-	if (PlayerPerception == FPS)
+	if (PlayerPerception == EPlayerPerceptionState::FPS)
 	{
 		ProjectileMovementComponent->bShouldBounce = false;
 	}
@@ -134,14 +134,14 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 		return;
 	}
 	
-	if (IsValid(ShooterGameMode) && ShooterGameMode->GetPlayerPerceptionState() == FPS)
+	if (IsValid(ShooterGameMode) && ShooterGameMode->GetPlayerPerceptionState() == EPlayerPerceptionState::FPS)
 	{
-		Disable();
-		
 		if (OnRelease.IsBound())
 		{
 			OnRelease.Broadcast(this);
 		}
+		
+		Disable();
 	}
 }
 
@@ -162,7 +162,7 @@ void AProjectile::Disable()
 {	
 	if (IsValid(SphereCollision))
 	{
-		SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SphereCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);	
 	}
 
 	if (IsValid(ProjectileMeshComponent))
