@@ -2,13 +2,12 @@
 
 #include "OnlineSubsystem.h"
 
-UMMCMultiplayerSessionSubsystem::UMMCMultiplayerSessionSubsystem():
-	OnCreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
-	OnFindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete)),
-	OnJoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplete)),
-	OnStartSessionCompleteDelegate(FOnStartSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnStartSessionComplete)),
-	OnDestroySessionCompleteDelegate(FOnDestroySessionCompleteDelegate::CreateUObject(this, &ThisClass::OnDestroySessionComplete))
-	
+UMMCMultiplayerSessionSubsystem::UMMCMultiplayerSessionSubsystem()
+	: OnCreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
+	  OnFindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete)),
+	  OnJoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplete)),
+	  OnStartSessionCompleteDelegate(FOnStartSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnStartSessionComplete)),
+	  OnDestroySessionCompleteDelegate(FOnDestroySessionCompleteDelegate::CreateUObject(this, &ThisClass::OnDestroySessionComplete))
 {
 }
 
@@ -21,6 +20,8 @@ void UMMCMultiplayerSessionSubsystem::Initialize(FSubsystemCollectionBase& Colle
 	{
 		SessionInterface = OnlineSubsystem->GetSessionInterface();
 	}
+
+	OnCreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete);
 
 	if (GEngine)
 	{
@@ -42,6 +43,8 @@ void UMMCMultiplayerSessionSubsystem::CreateSession(const int32 NumPublicConnect
 		SessionInterface->DestroySession(NAME_GameSession);
 	}
 
+	OnCreateSessionCompleteDelegateHandle = SessionInterface->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
+
 	SessionSettings = MakeShareable(new FOnlineSessionSettings());
 	SessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL";
 	SessionSettings->NumPublicConnections = NumPublicConnections;
@@ -55,6 +58,7 @@ void UMMCMultiplayerSessionSubsystem::CreateSession(const int32 NumPublicConnect
 	if (!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *SessionSettings))
 	{
 		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
+		OnMultiplayerCreateSessionComplete.Broadcast(false);
 	}
 }
 
@@ -76,6 +80,14 @@ void UMMCMultiplayerSessionSubsystem::StartSession()
 
 void UMMCMultiplayerSessionSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
+	UE_LOG(LogTemp, Warning, TEXT("UMMCMultiplayerSessionSubsystem::OnCreateSessionComplete:"));
+
+	if (SessionInterface != nullptr)
+	{
+		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
+	}
+
+	OnMultiplayerCreateSessionComplete.Broadcast(bWasSuccessful);
 }
 
 void UMMCMultiplayerSessionSubsystem::OnFindSessionComplete(bool bWasSuccessful)
@@ -83,7 +95,7 @@ void UMMCMultiplayerSessionSubsystem::OnFindSessionComplete(bool bWasSuccessful)
 }
 
 void UMMCMultiplayerSessionSubsystem::OnJoinSessionComplete(FName SessionName,
-	EOnJoinSessionCompleteResult::Type Result)
+                                                            EOnJoinSessionCompleteResult::Type Result)
 {
 }
 

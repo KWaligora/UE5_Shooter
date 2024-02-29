@@ -38,6 +38,12 @@ void UMMCMultiplayerMenu::MenuSetup(const int32 NumberOfPublicConnections /* = 4
 	}
 
 	MultiplayerSessionSubsystem = GameInstance->GetSubsystem<UMMCMultiplayerSessionSubsystem>();
+	if (MultiplayerSessionSubsystem == nullptr)
+	{
+		return;
+	}
+
+	MultiplayerSessionSubsystem->OnMultiplayerCreateSessionComplete.AddDynamic(this, &UMMCMultiplayerMenu::OnSessionCreated);
 }
 
 bool UMMCMultiplayerMenu::Initialize()
@@ -84,6 +90,14 @@ void UMMCMultiplayerMenu::OnClickedHostBtn()
 	if (IsValid(World))
 	{
 		World->ServerTravel("/Game/Maps/L_Lobby?listen", true);
+	}
+}
+
+void UMMCMultiplayerMenu::OnSessionCreated(bool bWasSuccessful)
+{
+	if (GEngine && bWasSuccessful)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Magenta, TEXT("SessionCreated"));
 	}
 }
 

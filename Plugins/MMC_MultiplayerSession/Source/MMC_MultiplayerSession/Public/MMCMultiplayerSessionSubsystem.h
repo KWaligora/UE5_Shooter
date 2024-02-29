@@ -7,11 +7,16 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "MMCMultiplayerSessionSubsystem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMultiplayerCreateSessionComplete, bool, bWasSuccessful);
+
 UCLASS()
 class MMC_MULTIPLAYERSESSION_API UMMCMultiplayerSessionSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
+public:
+	FOnMultiplayerCreateSessionComplete OnMultiplayerCreateSessionComplete;
+	
 private:
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<FOnlineSessionSettings> SessionSettings;

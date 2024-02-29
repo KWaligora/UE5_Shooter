@@ -37,6 +37,9 @@ private:
 
 	UFUNCTION()
 	void OnClickedHostBtn();
+
+	UFUNCTION()
+	void OnSessionCreated(bool bWasSuccessful);
 	
 	void MenuTearDown();
 };
