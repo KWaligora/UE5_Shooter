@@ -9,6 +9,12 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMultiplayerCreateSessionComplete, bool, bWasSuccessful);
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnMultiplayerFindSessionsComplete, const TArray<FOnlineSessionSearchResult>& SearchResult, bool bWasSuccessful);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMultiplayerJoinSessionComplete, EOnJoinSessionCompleteResult::Type Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMultiplayerDestroySessionComplete, bool, bWasSuccessful);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMultiplayerStartSessionComplete, bool, bWasSuccessful);
+
 UCLASS()
 class MMC_MULTIPLAYERSESSION_API UMMCMultiplayerSessionSubsystem : public UGameInstanceSubsystem
 {
@@ -16,10 +22,16 @@ class MMC_MULTIPLAYERSESSION_API UMMCMultiplayerSessionSubsystem : public UGameI
 
 public:
 	FOnMultiplayerCreateSessionComplete OnMultiplayerCreateSessionComplete;
-	
+	FOnMultiplayerFindSessionsComplete OnMultiplayerFindSessionsComplete;
+	FOnMultiplayerJoinSessionComplete OnMultiplayerJoinSessionComplete;
+	FOnMultiplayerDestroySessionComplete OnMultiplayerDestroySessionComplete;
+	FOnMultiplayerStartSessionComplete OnMultiplayerStartSessionComplete;
+
 private:
 	IOnlineSessionPtr SessionInterface;
+
 	TSharedPtr<FOnlineSessionSettings> SessionSettings;
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
 	FOnCreateSessionCompleteDelegate OnCreateSessionCompleteDelegate;
 	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
@@ -32,7 +44,7 @@ private:
 	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
 	FDelegateHandle OnStartSessionCompleteDelegateHandle;
 	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
-	
+
 public:
 	UMMCMultiplayerSessionSubsystem();
 
@@ -40,7 +52,7 @@ public:
 
 	void CreateSession(const int32 NumPublicConnections, const FString& MatchType);
 	void FindSessions(const int32 MaxSearchResults);
-	void JoinSession(const FOnlineSessionSearch& SessionSearchResult);
+	void JoinSession(const FOnlineSessionSearchResult& SessionSearchResult);
 	void DestroySession();
 	void StartSession();
 

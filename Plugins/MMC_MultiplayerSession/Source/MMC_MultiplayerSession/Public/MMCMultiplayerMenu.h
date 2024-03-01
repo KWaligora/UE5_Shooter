@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "MMCMultiplayerMenu.generated.h"
 
 class UMMCMultiplayerSessionSubsystem;
@@ -21,13 +22,13 @@ private:
 
 	int32 NumPublicConnections{4};
 	FString MatchType{TEXT("FreeForAll")};
-	
+
 	TWeakObjectPtr<UMMCMultiplayerSessionSubsystem> MultiplayerSessionSubsystem;
-	
+
 public:
 	virtual bool Initialize() override;
 	virtual void NativeDestruct() override;
-	
+
 	UFUNCTION(BlueprintCallable)
 	void MenuSetup(const int32 NumberOfPublicConnections = 4, const FString& TypeOfMatch = FString(TEXT("FreeForAll")));
 
@@ -40,6 +41,16 @@ private:
 
 	UFUNCTION()
 	void OnSessionCreated(bool bWasSuccessful);
-	
+
+	void OnFoundSession(const TArray<FOnlineSessionSearchResult>& OnlineSessionSearchResults, bool bWasSuccessful);
+
+	void OnJoinedSession(EOnJoinSessionCompleteResult::Type Result);
+
+	UFUNCTION()
+	void OnSessionStarted(bool bWasSuccessful);
+
+	UFUNCTION()
+	void OnSessionDestroyed(bool bWasSuccessful);
+
 	void MenuTearDown();
 };
