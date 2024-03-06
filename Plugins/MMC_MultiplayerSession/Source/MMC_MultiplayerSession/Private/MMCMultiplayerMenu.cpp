@@ -3,11 +3,12 @@
 #include "MMCMultiplayerSessionSubsystem.h"
 #include "Components/Button.h"
 
-void UMMCMultiplayerMenu::MenuSetup(const int32 NumberOfPublicConnections /* = 4*/, const FString& TypeOfMatch /* = "FreeForAll"*/)
+void UMMCMultiplayerMenu::MenuSetup(const int32 NumberOfPublicConnections /* = 4*/, const FString& TypeOfMatch /* = "FreeForAll"*/, const FString& LobbyPath)
 {
 	NumPublicConnections = NumberOfPublicConnections;
 	MatchType = TypeOfMatch;
-
+	PathToLobby = LobbyPath + TEXT("?listen");
+	
 	AddToViewport();
 	SetVisibility(ESlateVisibility::Visible);
 	SetIsFocusable(true);
@@ -78,6 +79,8 @@ void UMMCMultiplayerMenu::NativeDestruct()
 
 void UMMCMultiplayerMenu::OnClickedJoinBtn()
 {
+	JoinBtn->SetIsEnabled(false);
+	
 	if (!MultiplayerSessionSubsystem.IsValid())
 	{
 		UE_LOG(LogTemp, Error, TEXT("UMMCMultiplayerMenu::OnClickedHostBtn - invalid MultiplayerSessionSubsystem"))
@@ -89,6 +92,8 @@ void UMMCMultiplayerMenu::OnClickedJoinBtn()
 
 void UMMCMultiplayerMenu::OnClickedHostBtn()
 {
+	HostBtn->SetIsEnabled(false);
+	
 	if (!MultiplayerSessionSubsystem.IsValid())
 	{
 		UE_LOG(LogTemp, Error, TEXT("UMMCMultiplayerMenu::OnClickedHostBtn - invalid MultiplayerSessionSubsystem"))
@@ -100,12 +105,14 @@ void UMMCMultiplayerMenu::OnClickedHostBtn()
 	UWorld* const World = GetWorld();
 	if (IsValid(World))
 	{
-		World->ServerTravel("/Game/Maps/L_Lobby?listen", true);
+		World->ServerTravel(PathToLobby, true);
 	}
 }
 
 void UMMCMultiplayerMenu::OnSessionCreated(bool bWasSuccessful)
 {
+	HostBtn->SetIsEnabled(true);
+	
 	if (GEngine && bWasSuccessful)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Magenta, TEXT("SessionCreated"));
@@ -114,6 +121,8 @@ void UMMCMultiplayerMenu::OnSessionCreated(bool bWasSuccessful)
 
 void UMMCMultiplayerMenu::OnFoundSession(const TArray<FOnlineSessionSearchResult>& OnlineSessionSearchResults, bool bWasSuccessful)
 {
+	JoinBtn->SetIsEnabled(true);
+	
 	if (MultiplayerSessionSubsystem == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UMMCMultiplayerMenu::OnFoundSession - invalid MultiplayerSessionSubsystem"))
@@ -135,6 +144,8 @@ void UMMCMultiplayerMenu::OnFoundSession(const TArray<FOnlineSessionSearchResult
 
 void UMMCMultiplayerMenu::OnJoinedSession(EOnJoinSessionCompleteResult::Type Result)
 {
+	JoinBtn->SetIsEnabled(true);
+	
 	if (Result != EOnJoinSessionCompleteResult::Type::Success)
 	{
 		return;

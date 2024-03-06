@@ -20,8 +20,13 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	UButton* HostBtn;
 
+	UPROPERTY(meta=(BindWidget))
+	UButton* QuitBtn;
+	
 	int32 NumPublicConnections{4};
 	FString MatchType{TEXT("FreeForAll")};
+
+	FString PathToLobby{TEXT("")};
 
 	TWeakObjectPtr<UMMCMultiplayerSessionSubsystem> MultiplayerSessionSubsystem;
 
@@ -30,7 +35,7 @@ public:
 	virtual void NativeDestruct() override;
 
 	UFUNCTION(BlueprintCallable)
-	void MenuSetup(const int32 NumberOfPublicConnections = 4, const FString& TypeOfMatch = FString(TEXT("FreeForAll")));
+	void MenuSetup(const int32 NumberOfPublicConnections = 4, const FString& TypeOfMatch = FString(TEXT("FreeForAll")), const FString& LobbyPath = FString(TEXT("/Game/Maps/L_Lobby")));
 
 private:
 	UFUNCTION()

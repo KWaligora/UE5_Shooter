@@ -45,6 +45,10 @@ private:
 	FDelegateHandle OnStartSessionCompleteDelegateHandle;
 	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
 
+	bool bCreateSessionOnDestroy{false};
+	int32 LastNumPublicConnections;
+	FString LastMatchType;
+
 public:
 	UMMCMultiplayerSessionSubsystem();
 
