@@ -36,6 +36,8 @@ public:
 
 	void SetOverlappingWeapon_Sv(ABSTWeapon* Weapon);
 
+	UBSTCombatComponent* GetCombatComponent() const { return CombatComponent; }
+	
 protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);

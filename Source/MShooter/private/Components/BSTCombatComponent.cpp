@@ -3,11 +3,12 @@
 #include "Weapons/BSTWeapon.h"
 #include "Characters/BSTCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Net/UnrealNetwork.h"
 
 UBSTCombatComponent::UBSTCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	
+
 	bWantsInitializeComponent = true;
 }
 
@@ -18,15 +19,22 @@ void UBSTCombatComponent::InitializeComponent()
 	BSTCharacterOwnerWeak = GetOwner<ABSTCharacter>();
 }
 
+void UBSTCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UBSTCombatComponent, EquippedWeaponWeak);
+}
+
 void UBSTCombatComponent::EquipWeapon(ABSTWeapon* Weapon)
 {
 	if (!BSTCharacterOwnerWeak.IsValid() || !IsValid(Weapon))
 	{
 		return;
 	}
-	
+
 	EquippedWeaponWeak = Weapon;
-	
+
 	Weapon->SetOwner(BSTCharacterOwnerWeak.Get());
 	Weapon->SetWeaponState(EBSTWeaponState::Equipped);
 
@@ -43,4 +51,17 @@ void UBSTCombatComponent::EquipWeapon(ABSTWeapon* Weapon)
 	}
 
 	SkeletalMeshSocket->AttachActor(Weapon, SkeletalMeshComponent);
+
+	if (OnEquippedWeaponChanged.IsBound())
+	{
+		OnEquippedWeaponChanged.Broadcast(Weapon);
+	}
+}
+
+void UBSTCombatComponent::OnRep_EquippedWeaponWeak()
+{
+	if (OnEquippedWeaponChanged.IsBound())
+	{
+		OnEquippedWeaponChanged.Broadcast(EquippedWeaponWeak.Get());
+	}
 }

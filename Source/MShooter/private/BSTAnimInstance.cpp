@@ -1,6 +1,7 @@
 #include "BSTAnimInstance.h"
 
 #include "Characters/BSTCharacter.h"
+#include "Components/BSTCombatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void UBSTAnimInstance::NativeInitializeAnimation()
@@ -8,16 +9,26 @@ void UBSTAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	BSTCharacter = Cast<ABSTCharacter>(TryGetPawnOwner());
+
+	if (BSTCharacter == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UBSTAnimInstance::NativeInitializeAnimation - invalid BSTCharacter"))
+		return;
+	}
+
+	
+	UBSTCombatComponent* const CombatComponent = BSTCharacter->GetCombatComponent();
+	if (CombatComponent == nullptr)
+	{
+		return;
+	}
+
+	CombatComponent->OnEquippedWeaponChanged.AddUObject(this, &UBSTAnimInstance::OnEquippedWeaponChanged);
 }
 
 void UBSTAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	if (BSTCharacter == nullptr)
-	{
-		BSTCharacter = Cast<ABSTCharacter>(TryGetPawnOwner());
-	}
 
 	if (BSTCharacter == nullptr) return;
 
@@ -32,5 +43,10 @@ void UBSTAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 	
 	bIsInAir = CharacterMovementComponent->IsFalling();
-	bIsAccelerating = CharacterMovementComponent->GetCurrentAcceleration().Size() > 0.0f;
+	bIsAccelerating = CharacterMovementComponent->GetCurrentAcceleration().Size() > 0.0f;	
+}
+
+void UBSTAnimInstance::OnEquippedWeaponChanged(ABSTWeapon* Weapon)
+{
+	bWeaponEquipped = Weapon != nullptr;
 }
