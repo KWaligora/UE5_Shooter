@@ -23,6 +23,8 @@ ABSTCharacter::ABSTCharacter()
 
 	CombatComponent = CreateDefaultSubobject<UBSTCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void ABSTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -37,6 +39,9 @@ void ABSTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Equip"), IE_Pressed, this, &ABSTCharacter::ServerEquipBtnPressed);
+	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &ABSTCharacter::CrouchBtnPressed);
+	PlayerInputComponent->BindAction(TEXT("Aim"), IE_Pressed, this, &ABSTCharacter::AimBtnPressed);
+	PlayerInputComponent->BindAction(TEXT("Aim"), IE_Released, this, &ABSTCharacter::AimBtnReleased);
 
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &ABSTCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &ABSTCharacter::MoveRight);
@@ -64,7 +69,7 @@ void ABSTCharacter::SetOverlappingWeapon_Sv(ABSTWeapon* Weapon)
 		{
 			OverlappingWeapon->ShowPickupWidget(false);
 		}
-		
+
 		if (IsValid(Weapon))
 		{
 			Weapon->ShowPickupWidget(true);
@@ -108,6 +113,34 @@ void ABSTCharacter::LookUp(float Value)
 	AddControllerPitchInput(Value);
 }
 
+void ABSTCharacter::CrouchBtnPressed()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
+	}
+}
+
+void ABSTCharacter::AimBtnPressed_Implementation()
+{
+	if (CombatComponent != nullptr)
+	{
+		CombatComponent->SetIsAiming(true);
+	}
+}
+
+void ABSTCharacter::AimBtnReleased_Implementation()
+{
+	if (CombatComponent != nullptr)
+	{
+		CombatComponent->SetIsAiming(false);
+	}
+}
+
 void ABSTCharacter::ServerEquipBtnPressed_Implementation()
 {
 	if (CombatComponent != nullptr)
@@ -122,7 +155,7 @@ void ABSTCharacter::OnRep_OverlappingWeapon(ABSTWeapon* LastWeapon)
 	{
 		LastWeapon->ShowPickupWidget(false);
 	}
-	
+
 	if (!IsValid(OverlappingWeapon))
 	{
 		return;

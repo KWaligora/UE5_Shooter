@@ -37,12 +37,19 @@ public:
 	void SetOverlappingWeapon_Sv(ABSTWeapon* Weapon);
 
 	UBSTCombatComponent* GetCombatComponent() const { return CombatComponent; }
-	
+
 protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
+	void CrouchBtnPressed();
+
+	UFUNCTION(Server, Reliable)
+	void AimBtnPressed();
+
+	UFUNCTION(Server, Reliable)
+	void AimBtnReleased();
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipBtnPressed();

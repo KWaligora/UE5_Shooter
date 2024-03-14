@@ -16,7 +16,6 @@ void UBSTAnimInstance::NativeInitializeAnimation()
 		return;
 	}
 
-	
 	UBSTCombatComponent* const CombatComponent = BSTCharacter->GetCombatComponent();
 	if (CombatComponent == nullptr)
 	{
@@ -24,13 +23,15 @@ void UBSTAnimInstance::NativeInitializeAnimation()
 	}
 
 	CombatComponent->OnEquippedWeaponChanged.AddUObject(this, &UBSTAnimInstance::OnEquippedWeaponChanged);
+	CombatComponent->OnAimChanged.AddUObject(this, &UBSTAnimInstance::OnAimChanged);
 }
 
 void UBSTAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (BSTCharacter == nullptr) return;
+	if (BSTCharacter == nullptr)
+		return;
 
 	FVector Velocity = BSTCharacter->GetVelocity();
 	Velocity.Z = 0.0f;
@@ -41,12 +42,19 @@ void UBSTAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		return;
 	}
-	
+
 	bIsInAir = CharacterMovementComponent->IsFalling();
-	bIsAccelerating = CharacterMovementComponent->GetCurrentAcceleration().Size() > 0.0f;	
+	bIsAccelerating = CharacterMovementComponent->GetCurrentAcceleration().Size() > 0.0f;
+
+	bIsCrouch = BSTCharacter->bIsCrouched;
 }
 
 void UBSTAnimInstance::OnEquippedWeaponChanged(ABSTWeapon* Weapon)
 {
 	bWeaponEquipped = Weapon != nullptr;
+}
+
+void UBSTAnimInstance::OnAimChanged(bool bAiming)
+{
+	bIsAiming = bAiming;
 }

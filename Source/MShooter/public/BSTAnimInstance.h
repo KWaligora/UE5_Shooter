@@ -26,13 +26,20 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category="Movement", meta=(AllowPrivateAccess = true))
 	bool bIsAccelerating = false;
 
+	UPROPERTY(BlueprintReadOnly, Category="Movement", meta=(AllowPrivateAccess = true))
+	bool bIsCrouch = false;
+
 	UPROPERTY(BlueprintReadOnly, Category="Weapon", meta=(AllowPrivateAccess = true))
 	bool bWeaponEquipped = false;
-	
+
+	UPROPERTY(BlueprintReadOnly, Category="Weapon", meta=(AllowPrivateAccess = true))
+	bool bIsAiming = false;
+
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 private:
 	void OnEquippedWeaponChanged(ABSTWeapon* Weapon);
+	void OnAimChanged(bool bAiming);
 };

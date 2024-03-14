@@ -24,6 +24,7 @@ void UBSTCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UBSTCombatComponent, EquippedWeaponWeak);
+	DOREPLIFETIME(UBSTCombatComponent, bAiming);
 }
 
 void UBSTCombatComponent::EquipWeapon(ABSTWeapon* Weapon)
@@ -58,10 +59,33 @@ void UBSTCombatComponent::EquipWeapon(ABSTWeapon* Weapon)
 	}
 }
 
+void UBSTCombatComponent::SetIsAiming(bool bIsAiming)
+{
+	if (bAiming == bIsAiming)
+	{
+		return;
+	}
+
+	bAiming = bIsAiming;
+
+	if (OnAimChanged.IsBound())
+	{
+		OnAimChanged.Broadcast(bIsAiming);
+	}
+}
+
 void UBSTCombatComponent::OnRep_EquippedWeaponWeak()
 {
 	if (OnEquippedWeaponChanged.IsBound())
 	{
 		OnEquippedWeaponChanged.Broadcast(EquippedWeaponWeak.Get());
+	}
+}
+
+void UBSTCombatComponent::OnRep_bAiming()
+{
+	if (OnAimChanged.IsBound())
+	{
+		OnAimChanged.Broadcast(bAiming);
 	}
 }
