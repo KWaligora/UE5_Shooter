@@ -32,8 +32,18 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category="Weapon", meta=(AllowPrivateAccess = true))
 	bool bWeaponEquipped = false;
 
+	UPROPERTY(BlueprintReadOnly, Category="Movement", meta=(AllowPrivateAccess = true))
+	float YawOffset = 0.0f;
+
+	UPROPERTY(BlueprintReadOnly, Category="Movement", meta=(AllowPrivateAccess = true))
+	float Lean = 0.0f;
+
 	UPROPERTY(BlueprintReadOnly, Category="Weapon", meta=(AllowPrivateAccess = true))
 	bool bIsAiming = false;
+
+	FRotator CharacterRotationLastFrame = FRotator::ZeroRotator;
+	FRotator CharacterRotation = FRotator::ZeroRotator;
+	FRotator DeltaRotation = FRotator::ZeroRotator;
 
 public:
 	virtual void NativeInitializeAnimation() override;

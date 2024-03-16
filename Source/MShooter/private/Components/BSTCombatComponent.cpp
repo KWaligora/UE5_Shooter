@@ -3,6 +3,7 @@
 #include "Weapons/BSTWeapon.h"
 #include "Characters/BSTCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
 
 UBSTCombatComponent::UBSTCombatComponent()
@@ -31,6 +32,8 @@ void UBSTCombatComponent::EquipWeapon(ABSTWeapon* Weapon)
 {
 	if (!BSTCharacterOwnerWeak.IsValid() || !IsValid(Weapon))
 	{
+		BSTCharacterOwnerWeak->GetCharacterMovement()->bOrientRotationToMovement = true;
+		BSTCharacterOwnerWeak->bUseControllerRotationYaw = false;
 		return;
 	}
 
@@ -52,6 +55,9 @@ void UBSTCombatComponent::EquipWeapon(ABSTWeapon* Weapon)
 	}
 
 	SkeletalMeshSocket->AttachActor(Weapon, SkeletalMeshComponent);
+
+	BSTCharacterOwnerWeak->GetCharacterMovement()->bOrientRotationToMovement = false;
+	BSTCharacterOwnerWeak->bUseControllerRotationYaw = true;
 
 	if (OnEquippedWeaponChanged.IsBound())
 	{
@@ -80,6 +86,12 @@ void UBSTCombatComponent::OnRep_EquippedWeaponWeak()
 	{
 		OnEquippedWeaponChanged.Broadcast(EquippedWeaponWeak.Get());
 	}
+
+	if (EquippedWeaponWeak.IsValid())
+	{
+		BSTCharacterOwnerWeak->GetCharacterMovement()->bOrientRotationToMovement = false;
+		BSTCharacterOwnerWeak->bUseControllerRotationYaw = true;
+	}	
 }
 
 void UBSTCombatComponent::OnRep_bAiming()
