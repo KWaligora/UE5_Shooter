@@ -5,6 +5,8 @@
 #include "Components/ActorComponent.h"
 #include "BSTCombatComponent.generated.h"
 
+class UCharacterMovementComponent;
+
 class ABSTCharacter;
 class ABSTWeapon;
 
@@ -22,6 +24,7 @@ public:
 	
 protected:
 	TWeakObjectPtr<ABSTCharacter> BSTCharacterOwnerWeak;
+	TWeakObjectPtr<UCharacterMovementComponent> CharacterMovementComponent;
 
 	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeaponWeak)
 	TWeakObjectPtr<ABSTWeapon> EquippedWeaponWeak;
@@ -29,6 +32,12 @@ protected:
 	UPROPERTY(ReplicatedUsing=OnRep_bAiming)
 	bool bAiming = false;
 
+	UPROPERTY(EditAnywhere)
+	float BaseWalkSpeed = 600.0f;
+
+	UPROPERTY(EditAnywhere)
+	float AimWalkSpeed = 400.0f;
+	
 public:
 	UBSTCombatComponent();
 

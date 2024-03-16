@@ -2,6 +2,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/BSTCombatComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -25,6 +26,9 @@ ABSTCharacter::ABSTCharacter()
 	CombatComponent->SetIsReplicated(true);
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
 
 void ABSTCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

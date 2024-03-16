@@ -18,6 +18,18 @@ void UBSTCombatComponent::InitializeComponent()
 	Super::InitializeComponent();
 
 	BSTCharacterOwnerWeak = GetOwner<ABSTCharacter>();
+	if (!BSTCharacterOwnerWeak.IsValid())
+	{
+		return;
+	}
+
+	CharacterMovementComponent = BSTCharacterOwnerWeak->GetCharacterMovement();
+	if (!CharacterMovementComponent.IsValid())
+	{
+		return;
+	}
+
+	CharacterMovementComponent->MaxWalkSpeed = BaseWalkSpeed;
 }
 
 void UBSTCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -78,6 +90,11 @@ void UBSTCombatComponent::SetIsAiming(bool bIsAiming)
 	{
 		OnAimChanged.Broadcast(bIsAiming);
 	}
+
+	if (CharacterMovementComponent.IsValid())
+	{
+		CharacterMovementComponent->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
 }
 
 void UBSTCombatComponent::OnRep_EquippedWeaponWeak()
@@ -91,7 +108,7 @@ void UBSTCombatComponent::OnRep_EquippedWeaponWeak()
 	{
 		BSTCharacterOwnerWeak->GetCharacterMovement()->bOrientRotationToMovement = false;
 		BSTCharacterOwnerWeak->bUseControllerRotationYaw = true;
-	}	
+	}
 }
 
 void UBSTCombatComponent::OnRep_bAiming()
@@ -99,5 +116,9 @@ void UBSTCombatComponent::OnRep_bAiming()
 	if (OnAimChanged.IsBound())
 	{
 		OnAimChanged.Broadcast(bAiming);
+	}
+	if (CharacterMovementComponent.IsValid())
+	{
+		CharacterMovementComponent->MaxWalkSpeed = bAiming ? AimWalkSpeed : BaseWalkSpeed;
 	}
 }
